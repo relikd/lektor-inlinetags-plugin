@@ -1,8 +1,14 @@
-Example config file:
+# lektor plugin: inlinetags
+
+### Default config file
 
 ```ini
-template = <a class="tag" href="/tag/{tag}">{title}</a>
+root = /
+template = inlinetag.html
+regex = {{([^}]{1,32})}}
+link = tags/{tag}/
+replace = <a href="{link}">{title}</a>
 
-[replace]
-C# = C-Sharp
+[slugs]
+C# = c-sharp
 ```
