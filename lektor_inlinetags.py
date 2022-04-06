@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 from lektor.context import get_ctx
 from lektor.markdown import Markup
-from lektor.pluginsystem import Plugin
+from lektor.pluginsystem import Plugin  # subclass
 from lektor.sourceobj import VirtualSourceObject as VObj
 import re
 from typing import Set, Dict, Iterator, Generator
-from lektor_groupby import report_config_error
+from lektor_groupby.util import report_config_error
 
 
 class InlineTagsPlugin(Plugin):
@@ -14,7 +14,7 @@ class InlineTagsPlugin(Plugin):
 
     def on_setup_env(self, **extra) -> None:
         def _get_tags(record, *, recursive=False) -> Iterator[VObj]:
-            fn = self.env.jinja_env.filters['groupby']
+            fn = self.env.jinja_env.filters['vgroups']
             yield from fn(record, *self.config_keys, recursive=recursive)
 
         self.env.jinja_env.filters.update(inlinetags=_get_tags)
