@@ -1,26 +1,17 @@
 from lektor.context import get_ctx
-from lektor.db import Record  # typing
-from lektor.markdown import Markup
-from lektor.pluginsystem import Plugin, IniFile  # subclass
-from lektor.sourceobj import VirtualSourceObject as VObj  # typing
-
-from typing import Set, Dict, Any, Iterator, Generator
+from lektor.markdown import Markup  # isinstance
+from lektor.pluginsystem import Plugin  # subclass
 import re
-from lektor_groupby.groupby import GroupBy  # typing
 from lektor_groupby.util import report_config_error
-from lektor_groupby.watcher import GroupByCallbackArgs  # typing
+from typing import TYPE_CHECKING, Set, Dict, Any, Generator
+if TYPE_CHECKING:
+    from lektor.pluginsystem import IniFile
+    from lektor_groupby import GroupBy, GroupByCallbackArgs
 
 
 class InlineTagsPlugin(Plugin):
     name = 'inlinetags'
     description = 'Auto-detect and reference tags inside written text.'
-
-    def on_setup_env(self, **extra: Any) -> None:
-        def _fn(record: Record, *, recursive: bool = False) -> Iterator[VObj]:
-            fn = self.env.jinja_env.filters['vgroups']
-            yield from fn(record, *self.config_keys, recursive=recursive)
-
-        self.env.jinja_env.filters.update(inlinetags=_fn)
 
     def on_process_template_context(self, context: Dict, **extra: Any) -> None:
         if hasattr(context.get('this'), '_inlinetag_modified'):
@@ -28,7 +19,9 @@ class InlineTagsPlugin(Plugin):
             if ctx:
                 ctx.record_dependency(self.config_filename)
 
-    def on_groupby_before_build_all(self, groupby: GroupBy, **ex: Any) -> None:
+    def on_groupby_before_build_all(self, groupby: 'GroupBy', **extra: Any) \
+            -> None:
+        ''' lektor-groupby entry point. '''
         self.config_keys = set()  # type: Set[str]
         config = self.get_config()
         for sect in config.sections():
@@ -37,7 +30,9 @@ class InlineTagsPlugin(Plugin):
             if self._add(sect, config, groupby):
                 self.config_keys.add(sect)
 
-    def _add(self, sect_key: str, config: IniFile, groupby: GroupBy) -> bool:
+    def _add(self, sect_key: str, config: 'IniFile', groupby: 'GroupBy') \
+            -> bool:
+        ''' Parse config section and add callback. Return True on success. '''
         _pattern = config.section_as_dict(sect_key + '.pattern')
         regex_str = _pattern.get('match', r'{{([^}]{1,32})}}')  # type: str
         tag_replace = _pattern.get('replace', '{name}')  # type: str
@@ -50,7 +45,7 @@ class InlineTagsPlugin(Plugin):
         watcher = groupby.add_watcher(sect_key, config)
 
         @watcher.grouping()
-        def _inlinetag(args: GroupByCallbackArgs) -> Generator[str, str, None]:
+        def _fn(args: 'GroupByCallbackArgs') -> Generator[str, str, None]:
             arr = args.field if isinstance(args.field, list) else [args.field]
             _tags = {}  # type: Dict[str, str]
             for obj in arr:

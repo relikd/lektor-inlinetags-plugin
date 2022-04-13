@@ -7,14 +7,8 @@ Of course, you can configure a different matching pattern, e.g., instead of the 
 
 This plugin is based on the [lektor-groupby](https://github.com/relikd/lektor-groupby-plugin) plugin.
 All configuration options from groupby can be used (including multiple attribute names).
-
-
-### Known issues
-
-In rare cases, clicking on "Save Changes" will not replace the tags of the current page.
-It happens because the page is built concurrently (race condition).
-This affects only the currently edited page and only the inline replacements (the tags page is updated just fine).
-If this occurs to you, simply edit and save the page again.
+Further, you can access the tags of a page with the filter `|vgroups(key1, key2, recursive=False)` where key is `0..N` attribute keys.
+If no key is provided, all attributes will be returned – otherwise only matching attribute keys.
 
 
 ### Example config file
@@ -42,7 +36,7 @@ template = tag-page.html
 
 [inlinetags.pattern]
 match = {{([^}]{1,32})}}
-replace = <a href="/tag/{key}/">{name}</a>
+replace = <a class="tag" href="/tag/{key}/">{name}</a>
 
 [inlinetags.fields]
 title = "Tagged: " ~ this.group

@@ -14,7 +14,7 @@ setup(
     },
     author='relikd',
     url='https://github.com/relikd/lektor-inlinetags-plugin',
-    version='0.9',
+    version='0.9.1',
     description='Auto-detect and reference tags inside written text.',
     long_description=longdesc,
     long_description_content_type="text/markdown",
