@@ -2,7 +2,6 @@ from lektor.context import get_ctx
 from lektor.markdown import Markup  # isinstance
 from lektor.pluginsystem import Plugin  # subclass
 import re
-from lektor_groupby.util import report_config_error
 from typing import TYPE_CHECKING, Set, Dict, Any, Generator
 if TYPE_CHECKING:
     from lektor.pluginsystem import IniFile
@@ -39,10 +38,11 @@ class InlineTagsPlugin(Plugin):
         try:
             regex = re.compile(regex_str)
         except Exception as e:
-            report_config_error(sect_key, 'pattern.match', regex_str, e)
-            return False
+            raise ValueError(
+                'Invalid regex patter [{}.{}] = "{}"  –  Error: {}'.format(
+                    sect_key, 'pattern.match', regex_str, repr(e)))
 
-        watcher = groupby.add_watcher(sect_key, config)
+        watcher = groupby.add_watcher(sect_key, config, pre_build=True)
 
         @watcher.grouping()
         def _fn(args: 'GroupByCallbackArgs') -> Generator[str, str, None]:
@@ -54,14 +54,15 @@ class InlineTagsPlugin(Plugin):
                 if isinstance(obj, str) and str:
                     for match in regex.finditer(obj):
                         name = match.group(1)
-                        _tags[name] = yield name
+                        vobj = yield name
+                        _tags[name] = vobj.url_path
                 # ignore other types (int, float, date, url, undefined)
 
             # replace inline-tags with hyperlink
             if _tags:
                 def _repl_tags(match: re.Match) -> str:
                     name = match.group(1)
-                    return tag_replace.format(key=_tags[name], name=name)
+                    return tag_replace.format(url=_tags[name], name=name)
 
                 args.record._inlinetag_modified = True
                 # get field value

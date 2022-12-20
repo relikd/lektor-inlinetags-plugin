@@ -6,7 +6,7 @@ with open('README.md') as fp:
 setup(
     name='lektor-inlinetags',
     py_modules=['lektor_inlinetags'],
-    install_requires=['lektor-groupby>=0.9.6'],
+    install_requires=['lektor-groupby==0.9.8'],
     entry_points={
         'lektor.plugins': [
             'inlinetags = lektor_inlinetags:InlineTagsPlugin',

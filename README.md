@@ -31,15 +31,15 @@ In your plugin config (`configs/inlinetags.ini`):
 ```ini
 [inlinetags]
 root = /
-slug = "tag/{}/index.html".format(this.key)
+slug = tag/{key}/
 template = tag-page.html
 
 [inlinetags.pattern]
 match = {{([^}]{1,32})}}
-replace = <a class="tag" href="/tag/{key}/">{name}</a>
+replace = <a class="tag" href="{url}">{name}</a>
 
 [inlinetags.fields]
-title = "Tagged: " ~ this.group
+title = "Tagged: " ~ this.key_obj
 
 [inlinetags.key_map]
 C# = c-sharp
