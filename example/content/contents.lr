@@ -1,0 +1,3 @@
+title: Use Inlinetags in {{title}}!
+---
+body: This is a {{demo}} {{demo}} website that shows how to use {{Lektor}} with inline {{tags}}. Test {{C#}}.

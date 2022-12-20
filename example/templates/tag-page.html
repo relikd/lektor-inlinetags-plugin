@@ -1,0 +1,10 @@
+{% extends "page.html" %}
+{% block body %}
+<p>Key: <b>{{this.key}}</b> | Object: <b>{{this.key_obj}}</b></p>
+Page with <b>{{this.children.count()}}</b> tag(s):
+<ul>
+{%- for child in this.children|unique %}
+<li><a href="{{child|url}}">{{child.title}}</a></li>
+{%- endfor %}
+</ul>
+{% endblock %}

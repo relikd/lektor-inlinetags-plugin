@@ -1,0 +1,21 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Inlinetags</title>
+<style type="text/css">
+main { margin: 1em; }
+footer { padding: 1em; background: #DDD; }
+</style>
+<body>
+  <main>
+    {# Using "|safe" to allow clickable links in title #}
+    <h2>{{ this.title|safe }}</h2>
+    {% block body %}{{ this.body }}{% endblock %}
+  </main>
+  <footer>
+  <a href="/">Root</a>,
+  Tags:
+  {%- for x in this|vgroups(recursive=True, order_by='key_obj') %} 
+    <a href="{{ x|url }}">&lt;{{x.key_obj}}&gt;</a>
+  {%- endfor %} 
+  </footer>
+</body>
